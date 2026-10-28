@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grade 3 Science: Water and Desert Homes</title>
+<style>
+*{box-sizing:border-box}
+html{height:100%;font-size:clamp(16px,1.5vw,28px)}
+@supports(height:100dvh){html{height:100dvh}}
+body{height:100%;margin:0;display:flex;overflow:hidden;background:#e6f4ff;color:#12324d;font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;min-width:48px;min-height:48px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#side{flex:none;width:14rem;min-height:0;overflow-y:scroll;overscroll-behavior-y:contain;background:#0e3b63;color:#fff;padding:1rem 1rem calc(8rem + env(safe-area-inset-bottom))}
+#main{flex:1;min-width:0;min-height:0;overflow-y:scroll;overscroll-behavior-y:contain;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:1.2rem 1.6rem calc(12rem + env(safe-area-inset-bottom))}
+h1{font-size:1.3rem;margin:0 0 .2rem}
+h2{font-size:2rem;margin:0 0 .8rem}
+h3{font-size:1.4rem;margin:1.2rem 0 .6rem}
+.sub{opacity:.8;margin:0 0 1rem}
+.clock{width:100%;background:#ffd166;color:#12324d;font-weight:700;font-size:1.5rem;border-radius:1rem;margin:.3rem 0 1rem}
+.team{display:flex;justify-content:space-between;align-items:center;min-height:3.2rem;padding:.5rem .9rem;border-radius:1rem;background:#1b5a8f;margin-bottom:.6rem;font-size:1.1rem}
+.team b{font-size:1.9rem}
+.team.on{background:#ff6b6b;box-shadow:0 0 0 .25rem #ffd166}
+.st{display:block;width:100%;text-align:left;padding:.7rem .9rem;margin-bottom:.5rem;border-radius:1rem;background:#1b5a8f;color:#fff;font-size:1.05rem}
+.st.on{background:#fff;color:#0e3b63;font-weight:700}
+.msg{font-weight:700;font-size:1.2rem;margin:.3rem 0 .8rem}
+.turn{display:inline-block;background:#fff;border-radius:2rem;padding:.4rem 1.1rem;font-weight:700;font-size:1.2rem;margin-bottom:1rem;box-shadow:0 .15rem .5rem #0003}
+.card{background:#fff;border-radius:1.2rem;padding:1rem 1.2rem;box-shadow:0 .2rem .8rem #0002;font-size:1.2rem;line-height:1.5}
+.fb{margin-top:1rem;animation:pop .3s}
+@keyframes pop{from{transform:scale(.9);opacity:0}}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));margin-top:1rem}
+.big{display:block;width:100%;text-align:left;border-radius:1.2rem;padding:1rem 1.2rem;font-size:1.25rem;line-height:1.5;color:#fff}
+.big ul{margin:.5rem 0 0;padding-left:1.3rem}
+.big li{margin-bottom:.3rem}
+.ic{font-size:2.6rem}
+.fresh{background:#1e88e5}
+.salt{background:#0b5cad}
+.desert{background:#d9822b}
+.tray{display:flex;flex-wrap:wrap;gap:.7rem;margin:.5rem 0 1rem}
+.chip{display:flex;flex-direction:column;align-items:center;min-width:6.5rem;min-height:5.5rem;padding:.5rem 1rem;border-radius:1.2rem;background:#fff;font-size:2.3rem;box-shadow:0 .2rem .6rem #0003}
+.chip span{font-size:1.05rem;font-weight:700}
+.chip.sel{background:#ffd166;transform:scale(1.1)}
+.bin{min-height:9rem;font-size:1.35rem}
+.bin small{display:block;opacity:.9;font-size:1rem}
+.in{font-size:2rem;margin-top:.4rem}
+.q{font-size:1.8rem;font-weight:700;margin-bottom:1rem}
+.opts{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))}
+.opt{min-height:4.5rem;padding:1rem;border-radius:1.2rem;background:#fff;font-size:1.5rem;box-shadow:0 .2rem .6rem #0003}
+.opt.ok{background:#2eb872;color:#fff}
+.opt.no{background:#ef5350;color:#fff}
+.go{display:block;margin-top:1.4rem;padding:.9rem 2rem;border-radius:2rem;background:#ff6b6b;color:#fff;font-size:1.4rem;font-weight:700}
+.win{font-size:2rem;font-weight:700;text-align:center;background:#ffe9a8}
+.say{background:#fff;color:#12324d;margin-bottom:.7rem}
+.say.done{background:#c8f2d8}
+@media(max-width:700px){#side{width:9rem}}
+</style>
+</head>
+<body>
+<aside id="side">
+<h1>🌊 Water and Desert Homes</h1>
+<p class="sub">Grade 3 Science</p>
+<button id="clock" class="clock" onclick="tick()"></button>
+<div class="team" id="t0"><span>🦀 Crab</span><b id="s0">0</b></div>
+<div class="team" id="t1"><span>🐢 Turtle</span><b id="s1">0</b></div>
+<nav id="steps"></nav>
+</aside>
+<main id="main"><h2 id="title"></h2><div id="stage"></div></main>
+<script>
+const $=id=>document.getElementById(id);
+const T=["🦀 Team Crab","🐢 Team Turtle"];
+const STEPS=[["Learn",3,"🌍 Let’s learn!"],["Sort",4,"🐾 Where do I live?"],["Quiz",5,"❓ Team quiz"],["Wrap-up",3,"🏆 Winner and say it!"]];
+const L=[["💧","Freshwater","fresh",["Rivers, streams, lakes, ponds, wells","Very little <b>salt</b>","<b>Drinkable</b> 🥤","<b>Fish</b> live here 🐟"]],
+["🌊","Saltwater","salt",["Oceans and seas","A lot of <b>salt</b>","<b>Not</b> drinkable ❌","<b>Crabs</b> and <b>shrimp</b> live here 🦀🦐"]],
+["🏜️","Desert","desert",["Hot and dry","Cactus plants 🌵","Most animals are active <b>at night</b> 🌙","Camels, snakes, lizards"]]];
+const A=[["🐟","fish",0],["🐸","frog",0],["🦀","crab",1],["🦐","shrimp",1],["🐢","sea turtle",1],["🐪","camel",2],["🐍","snake",2],["🦎","lizard",2]];
+const B=[["💧","Freshwater","fresh","rivers · lakes · ponds"],["🌊","Saltwater","salt","oceans · seas"],["🏜️","Desert","desert","hot · dry · cactus"]];
+const Q=[
+["🌍 How much of Earth’s surface is covered by water?",["Less than 25%","About 50%","More than 75%"],2,"More than 75% of Earth is covered by water!"],
+["💧 Freshwater has very little ___.",["salt","fish","sand"],0,"Fresh water has very little salt, so it is drinkable."],
+["🥤 Is salt water drinkable?",["Yes, it is","No, it isn’t"],1,"Salt water has a lot of salt. It isn’t drinkable."],
+["🦀 Crabs and shrimp live in ___ water.",["fresh","salt"],1,"Crabs and shrimp live in salt water."],
+["🏞️ Which one is a freshwater ecosystem?",["an ocean","a river","a sea"],1,"Rivers, lakes and ponds are freshwater. Oceans and seas are salt water."],
+["🍎 An apple tree loses its leaves in autumn. It is ___.",["deciduous","evergreen"],0,"Deciduous trees lose their leaves."],
+["🌲 A pine tree stays green all year. It is ___.",["deciduous","evergreen"],1,"Evergreen trees keep their leaves all year."],
+["🌙 Most desert animals become active ___.",["at daytime","in summer","at night","throughout the day"],2,"Most desert animals become active at night."]];
+const K=["Freshwater has very little salt.","Saltwater isn’t drinkable.","Crabs and shrimp live in salt water.","Most desert animals are active at night."];
+let S,secs=900,timer=null;
+const V=[learn,sort,quiz,end];
+function reset(){S={step:0,team:0,sc:[0,0],open:[0,0,0],sel:-1,put:[],miss:0,qi:0,pick:-1,said:[0,0,0,0],msg:""};draw()}
+function turn(){return `<div class="turn">👉 ${T[S.team]}’s turn</div>`}
+function draw(){
+ $("title").innerHTML=STEPS[S.step][2];
+ $("steps").innerHTML=STEPS.map((s,i)=>`<button class="st${i==S.step?" on":""}" onclick="go(${i})">${i+1}. ${s[0]} · ${s[1]} min</button>`).join("");
+ [0,1].forEach(i=>{$("t"+i).className="team"+(S.team==i&&(S.step==1||S.step==2)?" on":"");$("s"+i).textContent=S.sc[i]});
+ $("stage").innerHTML=V[S.step]();
+}
+function go(i){S.step=i;S.msg="";draw();$("main").scrollTop=0}
+function learn(){
+ return `<div class="card">🌍 <b>More than 75%</b> of Earth’s surface is covered by water. A <b>water ecosystem</b> is a place in the water where many animals and plants live.</div>
+ <p class="msg" style="margin-top:1rem">👥 Two teams of 4 · take turns · 8 students = 8 animals and 8 questions!</p>
+ <div class="grid">${L.map((c,i)=>`<button class="big ${c[2]}" onclick="flip(${i})"><div class="ic">${c[0]}</div><b>${c[1]}</b>${S.open[i]?"<ul>"+c[3].map(f=>"<li>"+f+"</li>").join("")+"</ul>":"<div>👆 Tap to learn</div>"}</button>`).join("")}</div>
+ <button class="go" onclick="go(1)">Next: sort the animals ➜</button>`}
+function flip(i){S.open[i]=1-S.open[i];draw()}
+function sort(){
+ const done=S.put.length==A.length;
+ return `<p class="msg">${S.msg||"Tap an animal, then tap its home 👆"}</p>${done?"":turn()}
+ <div class="tray">${A.map((a,i)=>S.put.includes(i)?"":`<button class="chip${S.sel==i?" sel":""}" onclick="pickA(${i})">${a[0]}<span>${a[1]}</span></button>`).join("")}</div>
+ <div class="grid">${B.map((b,j)=>`<button class="big bin ${b[2]}" onclick="drop(${j})"><b>${b[0]} ${b[1]}</b><small>${b[3]}</small><div class="in">${A.map((a,i)=>S.put.includes(i)&&a[2]==j?a[0]:"").join(" ")}</div></button>`).join("")}</div>
+ ${done?'<button class="go" onclick="go(2)">Next: team quiz ➜</button>':""}`}
+function pickA(i){if(S.sel!=i)S.miss=0;S.sel=S.sel==i?-1:i;S.msg="";draw()}
+function drop(j){
+ if(S.sel<0){S.msg="👆 Tap an animal first!";return draw()}
+ if(A[S.sel][2]==j){if(!S.miss)S.sc[S.team]++;S.put.push(S.sel);S.sel=-1;S.miss=0;S.team=1-S.team;S.msg=S.put.length==A.length?"🎉 All animals are home!":"✅ Yes! Next team!"}
+ else{S.miss=1;S.msg="❌ Not there. Try again!"}
+ draw()}
+function quiz(){
+ const q=Q[S.qi],a=S.pick>=0;
+ return `<p class="msg">Question ${S.qi+1} of ${Q.length}</p>${turn()}
+ <div class="card q">${q[0]}</div>
+ <div class="opts">${q[1].map((o,i)=>`<button class="opt${a?(i==q[2]?" ok":i==S.pick?" no":""):""}" onclick="ans(${i})">${o}</button>`).join("")}</div>
+ ${a?`<div class="card fb">${S.pick==q[2]?"✅ Great job! ":"❌ Not quite. "}${q[3]}</div><button class="go" onclick="nextQ()">${S.qi==Q.length-1?"Finish":"Next"} ➜</button>`:""}`}
+function ans(i){if(S.pick>=0)return;S.pick=i;if(i==Q[S.qi][2])S.sc[S.team]++;draw()}
+function nextQ(){S.pick=-1;S.team=1-S.team;if(S.qi==Q.length-1)go(3);else{S.qi++;draw()}}
+function end(){
+ const a=S.sc[0],b=S.sc[1],w=a==b?"🤝 It’s a tie! Great teamwork!":T[a>b?0:1]+" wins! 🏆";
+ return `<div class="card win">${w}<br>🦀 ${a} · 🐢 ${b}</div>
+ <h3>🗣️ Say it! Tap each sentence after you say it.</h3>
+ ${K.map((k,i)=>`<button class="big say${S.said[i]?" done":""}" onclick="say(${i})">${S.said[i]?"⭐":"🗣️"} ${k}</button>`).join("")}
+ <button class="go" onclick="reset()">↺ Play again</button>`}
+function say(i){S.said[i]=1-S.said[i];draw()}
+function clk(){$("clock").textContent=(timer?"⏸ ":secs?"▶ ":"⏰ ")+Math.floor(secs/60)+":"+String(secs%60).padStart(2,"0")}
+function tick(){
+ if(timer){clearInterval(timer);timer=null}
+ else if(secs)timer=setInterval(()=>{if(--secs<=0){secs=0;clearInterval(timer);timer=null}clk()},1000);
+ clk()}
+reset();clk();
+</script>
+</body>
+</html>
